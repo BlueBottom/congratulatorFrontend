@@ -2,16 +2,12 @@
 
 import Button from "antd/es/button/button";
 import {Birthdays} from "../components/Birthdays";
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useState} from "react";
 import {BirthdayRequest, createBirthday, deleteBirthday, getAllBirthdays, updateBirthday} from "../services/birthdays";
 import {CreateUpdateBirthday, Mode} from "../components/CreateUpdateBirthday";
 import Title from "antd/es/typography/Title";
-import {Select, Space} from "antd";
-import method from "async-validator/dist-types/validator/method";
-import {Simulate} from "react-dom/test-utils";
-import select = Simulate.select;
+import {Select} from "antd";
 import Input from "antd/es/input/Input";
-
 
 export default function BirthdaysPage() {
     const defaultValues = {
@@ -28,6 +24,8 @@ export default function BirthdaysPage() {
     const [mode, setMode] = useState(Mode.Create);
     const [value, setSelectValue] = useState("");
     const [inputValue, setInputValue] = useState("");
+    const [startDate, setStartDate] = useState<Date>(new Date());
+    const [endDate, setEndDate] = useState<Date>(new Date());
 
     useEffect(() => {
         const getBirthdays = async () => {
@@ -95,10 +93,8 @@ export default function BirthdaysPage() {
         setLoading(false);
     };
 
-
     return (
-        <div>
-
+        <div className={"filters"}>
             <Button type="primary" onClick={openModal}>Добавить</Button>
 
             <CreateUpdateBirthday
@@ -111,17 +107,17 @@ export default function BirthdaysPage() {
             />
             <Select
                 defaultValue="Все"
-                style={{ width: 180 }}
+                style={{width: 180}}
                 onChange={handleChange}
                 options={[
-                    { label: 'Все', value: 'all'},
-                    { label: 'Сегодня', value: 'today' },
-                    { label: 'Завтра', value: 'tomorrow' },
-                    { label: 'Ближайшие 10 дней', value: '10 days' },
-                    { label: 'В этом месяце', value: 'this month' },
+                    {label: 'Все', value: 'all'},
+                    {label: 'Сегодня', value: 'today'},
+                    {label: 'Завтра', value: 'tomorrow'},
+                    {label: 'Ближайшие 10 дней', value: '10 days'},
+                    {label: 'В этом месяце', value: 'this month'},
                 ]}
             />
-            <Input placeholder={"Введите имя"} style={{ width: 180 }}  onChange={(e) => setInputValue(e.target.value)}/>
+            <Input placeholder={"Введите имя"} style={{width: 180}} onChange={(e) => setInputValue(e.target.value)}/>
             <Button type="primary" onClick={applyFilter}>Применить</Button>
 
             {loading ? (<Title>Загрузка...</Title>) : (
