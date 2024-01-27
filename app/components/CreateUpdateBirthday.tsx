@@ -62,8 +62,9 @@ export const CreateUpdateBirthday = ({
                 placeholder="Описание"
             />
 
-            <DatePicker 
-            onChange={(e)=>setDate(dayjs(e, 'YYYY-MM-DD').toDate())}
+            <DatePicker
+                defaultValue={dayjs(date)}
+                onChange={(e)=>setDate(dayjs(e, 'YYYY-MM-DD').toDate())}
             />
 
         </Modal>

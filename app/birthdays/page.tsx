@@ -2,10 +2,15 @@
 
 import Button from "antd/es/button/button";
 import {Birthdays} from "../components/Birthdays";
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {BirthdayRequest, createBirthday, deleteBirthday, getAllBirthdays, updateBirthday} from "../services/birthdays";
 import {CreateUpdateBirthday, Mode} from "../components/CreateUpdateBirthday";
 import Title from "antd/es/typography/Title";
+import {Select, Space} from "antd";
+import method from "async-validator/dist-types/validator/method";
+import {Simulate} from "react-dom/test-utils";
+import select = Simulate.select;
+import Input from "antd/es/input/Input";
 
 
 export default function BirthdaysPage() {
@@ -21,10 +26,12 @@ export default function BirthdaysPage() {
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [mode, setMode] = useState(Mode.Create);
+    const [value, setSelectValue] = useState("");
+    const [inputValue, setInputValue] = useState("");
 
     useEffect(() => {
         const getBirthdays = async () => {
-            const birthdays = await getAllBirthdays();
+            const birthdays = await getAllBirthdays(value, inputValue);
             setLoading(false);
             setBirthdays(birthdays);
         };
@@ -37,7 +44,7 @@ export default function BirthdaysPage() {
         await createBirthday(request);
         closeModal();
 
-        const birthdays = await getAllBirthdays();
+        const birthdays = await getAllBirthdays(value, inputValue);
         setBirthdays(birthdays);
     }
 
@@ -45,7 +52,7 @@ export default function BirthdaysPage() {
         await updateBirthday(id, request);
         closeModal();
 
-        const birthdays = await getAllBirthdays();
+        const birthdays = await getAllBirthdays(value, inputValue);
         setBirthdays(birthdays);
     }
 
@@ -53,7 +60,7 @@ export default function BirthdaysPage() {
         await deleteBirthday(id);
         closeModal();
 
-        const birthdays = await getAllBirthdays();
+        const birthdays = await getAllBirthdays(value, inputValue);
         setBirthdays(birthdays);
     }
 
@@ -73,8 +80,25 @@ export default function BirthdaysPage() {
         setIsModalOpen(true);
     }
 
+    const handleChange = (value: string) => {
+        setSelectValue(value);
+    };
+
+    const handleInput = (inputValue: string) => {
+        setInputValue(inputValue);
+    }
+
+    const applyFilter = async () => {
+        setLoading(true);
+        const filteredBirthdays = await getAllBirthdays(value, inputValue);
+        setBirthdays(filteredBirthdays);
+        setLoading(false);
+    };
+
+
     return (
         <div>
+
             <Button type="primary" onClick={openModal}>Добавить</Button>
 
             <CreateUpdateBirthday
@@ -85,6 +109,20 @@ export default function BirthdaysPage() {
                 handleUpdate={handleUpdateBirthday}
                 handleCancel={closeModal}
             />
+            <Select
+                defaultValue="Все"
+                style={{ width: 180 }}
+                onChange={handleChange}
+                options={[
+                    { label: 'Все', value: 'all'},
+                    { label: 'Сегодня', value: 'today' },
+                    { label: 'Завтра', value: 'tomorrow' },
+                    { label: 'Ближайшие 10 дней', value: '10 days' },
+                    { label: 'В этом месяце', value: 'this month' },
+                ]}
+            />
+            <Input placeholder={"Введите имя"} style={{ width: 180 }}  onChange={(e) => setInputValue(e.target.value)}/>
+            <Button type="primary" onClick={applyFilter}>Применить</Button>
 
             {loading ? (<Title>Загрузка...</Title>) : (
                 <Birthdays birthdays={birthdays} handleOpen={openEditModal} handleDelete={handleDeleteBirthday}/>)}

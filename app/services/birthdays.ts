@@ -4,8 +4,8 @@ export interface BirthdayRequest {
     date: Date;
 }
 
-export const getAllBirthdays = async() => {
-    const response = await fetch("http://localhost:5149/Birthdays");
+export const getAllBirthdays = async(intervalTime: string, searchString: string) => {
+    const response = await fetch(`http://localhost:5149/Birthdays?intervalTime=${intervalTime}&searchString=${searchString}`);
 
     return response.json();
 };
